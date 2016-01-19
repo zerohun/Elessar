@@ -9,6 +9,7 @@
     "jquery": "~1.11.0-rc1"
   },
   "devDependencies": {
+    "esprima-six": "https://github.com/zerohun/esprima-six.git",
     "browserify": "~3.24.1",
     "browserify-shim": "~3.2.2",
     "coverify": "^1.0.7",
