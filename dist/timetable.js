@@ -758,9 +758,12 @@
                     DUPLICATED: 1,
                     FOLDED: 2,
                     LATER_START: 3,
-                    SAME_START_END: 4
+                    SAME_START_END: 4,
+                    INVALIDATE: 5
                 };
                 function validateTimeRange(newTimeRange, tasks) {
+                    if (newTimeRange.work_start.toString() === 'Invalid date' || newTimeRange.work_end.toString() === 'Invalid date')
+                        return new TimeRangeValidationError(TimeRangeValidationError.TYPES.INVALIDATE, newTimeRange);
                     if (newTimeRange.work_start.toString() === newTimeRange.work_end.toString())
                         return new TimeRangeValidationError(TimeRangeValidationError.TYPES.SAME_START_END, newTimeRange);
                     if (newTimeRange.work_start > newTimeRange.work_end)
