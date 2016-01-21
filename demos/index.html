@@ -46,6 +46,7 @@ var timeTable = TimeTable();
 $('#time-table').prepend(timeTable.rangeBar.$el);
 timeTable.on("click.task", function(ev, t){
   timeTable.unbindTasks();
+  console.log(ev);
   console.log(t);
   t.bindForm("form");
 })
