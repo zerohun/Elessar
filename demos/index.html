@@ -51,18 +51,12 @@ var timeTable = TimeTable({
 $('body').prepend(timeTable.$el);
 timeTable.on("click.task", function(ev, t){
   timeTable.unbindTasks();
-  console.log(ev);
-  console.log(t);
   timeTable.bindTaskForm(t, $("form"));
 }).on("changing.task", function(ev, t){
-  console.log('changing task');
 }).on("change.task", function(ev, t){
-  console.log(t);
 }).on("addtask", function(ev, t){
-  console.log('addtask');
   timeTable.bindTaskForm(t, $("form"));
 }).on("delete.task", function(ev,jobId){
-  console.log(jobId);
 });
 window.t = timeTable;
 $('form').submit(function(e){
