@@ -44,7 +44,10 @@
 <pre class="changing"></pre>
 
 <script>
-var timeTable = TimeTable();
+var timeTable = TimeTable({
+  min:moment().startOf('day').add(7, 'hour').format('LLLL'),
+  max:moment().startOf('day').add(18, 'hour').format('LLLL'),
+});
 $('body').prepend(timeTable.$el);
 timeTable.on("click.task", function(ev, t){
   timeTable.unbindTasks();
