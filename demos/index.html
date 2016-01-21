@@ -43,11 +43,16 @@
 
 <script>
 var timeTable = TimeTable();
-$('#time-table').prepend(timeTable.rangeBar.$el);
+$('#time-table').prepend(timeTable.$el);
 timeTable.on("click.task", function(ev, t){
   timeTable.unbindTasks();
   console.log(ev);
   console.log(t);
+  t.bindForm("form");
+}).on("changing.task", function(ev, t){
+  console.log('ct');
+}).on("addtask", function(ev, t){
+  console.log('addtask');
   t.bindForm("form");
 })
 window.t = timeTable;
@@ -59,6 +64,12 @@ $('form').submit(function(e){
   }
   timeTable.addTask(params);
   e.preventDefault();
+});
+$('body').click(function(){
+  timeTable.unbindTasks();
+});
+$('input,button').click(function(ev){
+  ev.stopPropagation();
 });
 </script>
 </body>
