@@ -25,11 +25,11 @@
       <form id="cerate-form-1">
         <div class="form-group">
            <label for="work_start">work_start</label>
-          <input type="time" name="work_start" data-tt-model="work_start">
+          <input type="time" name="work_start" data-tt-model="work_start" placeholder="HH:mm ex) 19:30">
         </div>
          <div class="form-group">
            <label for="work_end">work_end</label>
-          <input type="time" name="work_end" data-tt-model="work_end">
+          <input type="time" name="work_end" data-tt-model="work_end" placeholder="HH:mm ex) 20:30">
         </div>
          <div class="form-group">
            <label for="unpaid_minutes">unpaid_minutes</label>
@@ -56,11 +56,11 @@
       <form id="edit-form-1">
          <div class="form-group">
            <label for="work_start">work_start</label>
-          <input type="time" name="work_start" data-tt-model="work_start">
+          <input type="time" name="work_start" data-tt-model="work_start" placeholder="HH:mm ex) 19:30">
         </div>
          <div class="form-group">
            <label for="work_end">work_end</label>
-          <input type="time" name="work_end" data-tt-model="work_end">
+          <input type="time" name="work_end" data-tt-model="work_end" placeholder="HH:mm ex) 20:30">
         </div>
          <div class="form-group">
            <label for="unpaid_minutes">unpaid_minutes</label>
@@ -102,11 +102,11 @@
       <form id="edit-form-2-1">
         <div class="form-group">
            <label for="work_start">work_start</label>
-          <input type="time" name="work_start" data-tt-model="work_start">
+          <input type="time" name="work_start" data-tt-model="work_start" placeholder="HH:mm ex) 19:30">
         </div>
          <div class="form-group">
            <label for="work_end">work_end</label>
-          <input type="time" name="work_end" data-tt-model="work_end">
+          <input type="time" name="work_end" data-tt-model="work_end" placeholder="HH:mm ex) 20:30">
         </div>
          <div class="form-group">
            <label for="unpaid_minutes">unpaid_minutes</label>
@@ -132,11 +132,11 @@
       <form id="edit-form-2-2">
          <div class="form-group">
            <label for="work_start">work_start</label>
-          <input type="time" name="work_start" data-tt-model="work_start">
+          <input type="time" name="work_start" data-tt-model="work_start" placeholder="HH:mm ex) 19:30">
         </div>
          <div class="form-group">
            <label for="work_end">work_end</label>
-          <input type="time" name="work_end" data-tt-model="work_end">
+          <input type="time" name="work_end" data-tt-model="work_end" placeholder="HH:mm ex) 20:30">
         </div>
          <div class="form-group">
            <label for="unpaid_minutes">unpaid_minutes</label>
@@ -183,6 +183,7 @@ $('#cerate-form-1').submit(function(e){
   for(var t of sArray){
     params[t.name] = t.value;
   }
+  timeTableFirst.addTask(params);
 });
 $('body').click(function(){
   timeTableFirst.unbindTasks();

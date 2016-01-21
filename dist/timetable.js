@@ -1074,10 +1074,7 @@
                             for (var k in task.timeRange) {
                                 (function (k) {
                                     var $input = $form.find('input[data-tt-model=' + k + ']');
-                                    task.timeRange[k].inputBind($input, [
-                                        'change.tt-model',
-                                        'keyup.tt-model'
-                                    ], function (val) {
+                                    task.timeRange[k].inputBind($input, ['change.tt-model'], function (val) {
                                         return moment(val, TIME_FORMAT);
                                     }, function (val) {
                                         return val.format(TIME_FORMAT);
