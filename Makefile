@@ -1,12 +1,12 @@
 export SHELL := /bin/bash
 export PATH  := $(shell npm bin):$(PATH)
 
-ENTRY_FILE="./lib/rangebar.js"
+ENTRY_FILE="./lib/timetable.js"
 DEPS := $(shell node_modules/.bin/browserify --list $(ENTRY_FILE))
 TEST_FILES = $(filter-out test/utils.js, $(wildcard test/*.js))
 
-all: dist/elessar.js
-min: dist/elessar.min.js
+all: dist/timetable.js
+min: dist/timetable.min.js
 
 dist/%.min.js: dist/%.js
 	uglifyjs $< -o $@

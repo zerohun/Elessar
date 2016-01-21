@@ -57,6 +57,12 @@
   width: 0;
   z-index: 10;
 }
+
+.elessar-range.selected{
+  background: cyan;
+  color: black;
+}
+
 .elessar-vertical .elessar-range {
   width: auto;
   height: 0;

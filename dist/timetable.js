@@ -1,5 +1,5 @@
 !function (definition) {
-    return typeof exports === 'object' ? module.exports = definition(require('jquery')) : typeof define === 'function' && define.amd ? define(['jquery'], definition) : window.RangeBar = definition(window.jQuery);
+    return typeof exports === 'object' ? module.exports = definition(require('jquery')) : typeof define === 'function' && define.amd ? define(['jquery'], definition) : window.TimeTable = definition(window.jQuery);
 }(function ($) {
     return function e(t, n, r) {
         function s(o, u) {
@@ -86,7 +86,7 @@
             },
             {
                 './raf': 6,
-                'estira': 10
+                'estira': 12
             }
         ],
         2: [
@@ -127,7 +127,7 @@
             },
             {
                 './element': 1,
-                './vertical': 9
+                './vertical': 11
             }
         ],
         4: [
@@ -326,7 +326,8 @@
                             if (valOpts.trigger) {
                                 this.$el.triggerHandler('changing', [
                                     range,
-                                    this.$el
+                                    this.$el,
+                                    this
                                 ]);
                                 this.hasChanged = true;
                             }
@@ -349,6 +350,7 @@
                         click: function (ev) {
                             ev.stopPropagation();
                             ev.preventDefault();
+                            this.trigger('click.range', this);
                             var self = this;
                             if (ev.which !== 2 || !this.perant.options.allowDelete)
                                 return;
@@ -387,7 +389,8 @@
                                 if (self.hasChanged && !self.swapping)
                                     self.trigger('change', [
                                         self.range,
-                                        self.$el
+                                        self.$el,
+                                        self
                                     ]);
                                 self.swapping = false;
                                 $(document).off('mouseup.elessar mousemove.elessar touchend.elessar touchmove.elessar');
@@ -472,7 +475,7 @@
             {
                 './element': 1,
                 './eventprop': 2,
-                './vertical': 9
+                './vertical': 11
             }
         ],
         8: [
@@ -584,17 +587,19 @@
                             this.insertRangeIndex($range, this.findGap(range));
                             $range.val(range);
                             var self = this;
-                            $range.on('changing', function (ev, nrange, changed) {
+                            $range.on('changing', function (ev, nrange, changed, rangeObj) {
                                 ev.stopPropagation();
                                 self.trigger('changing', [
                                     self.val(),
-                                    changed
+                                    changed,
+                                    rangeObj
                                 ]);
-                            }).on('change', function (ev, nrange, changed) {
+                            }).on('change', function (ev, nrange, changed, rangeObj) {
                                 ev.stopPropagation();
                                 self.trigger('change', [
                                     self.val(),
-                                    changed
+                                    changed,
+                                    rangeObj
                                 ]);
                             });
                             return $range;
@@ -732,10 +737,420 @@
                 './mark.js': 4,
                 './phantom': 5,
                 './range': 7,
-                './vertical': 9
+                './vertical': 11
             }
         ],
         9: [
+            function (_dereq_, module, exports) {
+                var Base = _dereq_('estira');
+                function parseTimeStr(timeStr) {
+                    if (!timeStr)
+                        return null;
+                    timeArray = timeStr.split(':');
+                    return moment().hour(timeArray[0]).minute(timeArray[1]).second(0);
+                }
+                function TimeRangeValidationError(errorType, timeRange) {
+                    this.errorType = errorType;
+                    this.timeRange = timeRange;
+                    this.isErrorObj = true;
+                }
+                TimeRangeValidationError.TYPES = {
+                    DUPLICATED: 1,
+                    FOLDED: 2,
+                    LATER_START: 3,
+                    SAME_START_END: 4
+                };
+                function validateTimeRange(newTimeRange, tasks) {
+                    if (newTimeRange.work_start.toString() === newTimeRange.work_end.toString())
+                        return new TimeRangeValidationError(TimeRangeValidationError.TYPES.SAME_START_END, newTimeRange);
+                    if (newTimeRange.work_start > newTimeRange.work_end)
+                        return new TimeRangeValidationError(TimeRangeValidationError.TYPES.LATER_START, newTimeRange);
+                    var timeRange;
+                    for (var i in tasks) {
+                        timeRange = task[i].timeRange;
+                        var trKeys = [
+                                'work_start',
+                                'work_end'
+                            ];
+                        for (var j in trKeys) {
+                            trKey = trKeys[j];
+                            if (timeRange.work_start.get() < newTimeRange[trKey] && timeRange.work_end.get() > newTimeRange[trKey] || newTimeRange.work_start < timeRange[trKey].get() && newTimeRange.work_end > timeRange[trKey].get()) {
+                                return new TimeRangeValidationError(TimeRangeValidationError.TYPES.FOLDED, newTimeRange);
+                            }
+                        }
+                        if (timeRange.work_start.get().isSame(newTimeRange.work_start) && timeRange.work_end.get().isSame(newTimeRange.work_end)) {
+                            return new TimeRangeValidationError(TimeRangeValidationError.TYPES.DUPLICATED, newTimeRange);
+                        }
+                    }
+                    return true;
+                }
+                function SimpleReactiveVar(val) {
+                    var val = val;
+                    var $input = null;
+                    var bindEventTypes = null;
+                    var onChanges = [];
+                    var validationFunc;
+                    this.onChange = function (callbackFunc) {
+                        onChanges.push(callbackFunc);
+                    };
+                    this.set = function (newVal) {
+                        if (validationFunc) {
+                            var result = validationFunc(newVal);
+                            this.printToInput();
+                            if (result.isErrorObj)
+                                return result;
+                        }
+                        val = newVal;
+                        this.printToInput();
+                        for (var i in onChanges) {
+                            onChanges[i](val);
+                        }
+                    };
+                    this.setValidation = function (pValidationFunc) {
+                        validationFunc = pValidationFunc;
+                    };
+                    this.setWithoutCallback = function (newVal) {
+                        val = newVal;
+                        this.printToInput();
+                    };
+                    this.get = function () {
+                        return val;
+                    };
+                    this.printToInput = function () {
+                        if ($input) {
+                            if (this.outputFilterFunc)
+                                $input.val(this.outputFilterFunc(val));
+                            else
+                                $input.val(val);
+                        }
+                    };
+                    this.inputBind = function ($pInput, eventTypes, inputFilterFunc, outputFilterFunc) {
+                        $input = $pInput;
+                        bindEventTypes = typeof eventTypes !== 'Array' ? eventTypes : [eventTypes];
+                        this.inputFilterFunc = inputFilterFunc;
+                        this.outputFilterFunc = outputFilterFunc;
+                        this.printToInput();
+                        var self = this;
+                        for (var i in bindEventTypes) {
+                            var eventType = bindEventTypes[i];
+                            $input.bind(eventType, function (ev) {
+                                var val = $input.val();
+                                if (inputFilterFunc)
+                                    self.set(inputFilterFunc(val));
+                                else
+                                    self.set(val);
+                            });
+                        }
+                    };
+                    this.inputUnbind = function () {
+                        if (!bindEventTypes)
+                            return;
+                        for (var i in bindEventTypes) {
+                            var eventType = bindEventTypes[i];
+                            $input.unbind(eventType);
+                        }
+                        $input.val('');
+                    };
+                }
+                var Task = Base.extend({
+                        initialize: function (params) {
+                            var work_start_val = parseTimeStr(params.work_start);
+                            var work_end_val = parseTimeStr(params.work_end);
+                            this.timeRange = {
+                                work_start: new SimpleReactiveVar(work_start_val),
+                                work_end: new SimpleReactiveVar(work_end_val)
+                            };
+                            var self = this;
+                            this.timeRange.work_start.setValidation(function (newVal) {
+                                var timeRange = {
+                                        work_start: newVal,
+                                        work_end: self.timeRange.work_end.get()
+                                    };
+                                return validateTimeRange(timeRange, self.tasks.filter(function (t) {
+                                    return t !== self;
+                                }));
+                            });
+                            this.timeRange.work_end.setValidation(function (newVal) {
+                                var timeRange = {
+                                        work_start: self.timeRange.work_start.get(),
+                                        work_end: newVal
+                                    };
+                                return validateTimeRange(timeRange, self.tasks.filter(function (t) {
+                                    return t !== self;
+                                }));
+                            });
+                            this.info = {
+                                unpaid_minutes: new SimpleReactiveVar(params.unpaid_minutes),
+                                job_name: new SimpleReactiveVar(params.job_name),
+                                job_id: new SimpleReactiveVar(params.job_id),
+                                timecard_id: new SimpleReactiveVar(params.timecard_id)
+                            };
+                            this.tasks = params.tasks;
+                        },
+                        remove: function () {
+                            for (var i in this.tasks) {
+                                if (this === this.tasks[i]) {
+                                    this.tasks.splice(i, 1);
+                                    return;
+                                }
+                            }
+                        },
+                        toJsonObj: function () {
+                            return {
+                                work_start: this.timeRange.work_start.get(),
+                                work_end: this.timeRange.work_end.get(),
+                                unpaid_minutes: this.info.unpaid_minutes.get(),
+                                job_name: this.info.job_name.get(),
+                                job_id: this.info.job_id.get(),
+                                timecard_id: this.info.timecard_id.get()
+                            };
+                        },
+                        fromJsonObj: function (jsonObj) {
+                            this.timeRange.work_start.set(jsonObj.work_start);
+                            this.timeRange.work_end.set(jsonObj.work_end);
+                            this.info.unpaid_minutes.set(jsonObj.unpaid_minutes);
+                            this.info.job_name.set(jsonObj.job_name);
+                            this.info.job_id.set(jsonObj.job_id);
+                            this.info.timecard_id.set(jsonObj.timecard_id);
+                        }
+                    });
+                Task.createTask = function (params) {
+                    var timeRange = {
+                            work_start: moment(params.work_start, 'HH:mm'),
+                            work_end: moment(params.work_end, 'HH:mm')
+                        };
+                    var vResult = validateTimeRange(timeRange, params.tasks);
+                    if (vResult === true)
+                        return Task(params);
+                    else
+                        return vResult;
+                };
+                module.exports = Task;
+            },
+            { 'estira': 12 }
+        ],
+        10: [
+            function (_dereq_, module, exports) {
+                var RangeBar = _dereq_('./rangebar');
+                var Task = _dereq_('./task');
+                var Base = _dereq_('estira');
+                var TIME_FORMAT = 'HH:mm';
+                var TimeTable = Base.extend({
+                        initialize: function (options) {
+                            if (!options)
+                                options = {};
+                            this.tasks = [];
+                            this.rangeBar = RangeBar({
+                                min: options.min || moment().startOf('day').format('LLLL'),
+                                max: options.max || moment().startOf('day').add(1, 'day').format('LLLL'),
+                                valueFormat: function (ts) {
+                                    return moment(ts).format(TIME_FORMAT);
+                                },
+                                valueParse: function (date) {
+                                    return moment(date).valueOf();
+                                },
+                                label: function (a) {
+                                    return JSON.stringify(a);
+                                },
+                                snap: 1000 * 60 * 15,
+                                minSize: options.minSize || 1000 * 60 * 15,
+                                bgLabels: options.max || 4,
+                                allowSwap: false
+                            });
+                            this.$el = $('<div class=\'time-table\'></div>').prepend(this.rangeBar.$el);
+                            var self = this;
+                            this.rangeBar.on('addrange', function (ev, val, range) {
+                                ev.stopPropagation();
+                                ev.preventDefault();
+                                var task = self.addTaskFromRange(range);
+                                self.$el.trigger('addtask', task);
+                            });
+                            this.rangeBar.on('click.range', function (ev, range) {
+                                ev.stopPropagation();
+                                ev.preventDefault();
+                                var task = self.findTaskByRange(range);
+                                if (task)
+                                    self.$el.trigger('click.task', task);
+                            });
+                            this.rangeBar.on('change', function (ev, a, b, rangeObj) {
+                                var task = self.findTaskByRange(rangeObj);
+                                if (task)
+                                    self.$el.trigger('change.task', task);
+                            });
+                            this.rangeBar.on('changing', function (ev, nrange, changed, rangeObj) {
+                                ev.stopPropagation();
+                                ev.preventDefault();
+                                var task = self.findTaskByRange(rangeObj);
+                                var work_start_val = self.rangeValToMoment(rangeObj.range[0]);
+                                var work_end_val = self.rangeValToMoment(rangeObj.range[1]);
+                                task.timeRange.work_start.setWithoutCallback(work_start_val);
+                                task.timeRange.work_end.setWithoutCallback(work_end_val);
+                            });
+                        },
+                        on: function () {
+                            this.$el.on.apply(this.$el, arguments);
+                            return this;
+                        },
+                        setOnTimeChangeFunc: function (task) {
+                            var self = this;
+                            var onTimeChange = function () {
+                                var rangeNum = [
+                                        self.rangeBar.abnormalise(task.timeRange.work_start.get()),
+                                        self.rangeBar.abnormalise(task.timeRange.work_end.get())
+                                    ];
+                                task.range.val(rangeNum);
+                            };
+                            task.timeRange.work_start.onChange(onTimeChange);
+                            task.timeRange.work_end.onChange(onTimeChange);
+                        },
+                        addTask: function (params) {
+                            params.tasks = this.tasks;
+                            var task = Task.createTask(params);
+                            if (task.isErrorObj)
+                                return task;
+                            var rangeVal = [
+                                    this.rangeBar.abnormalise(task.timeRange.work_start.get()),
+                                    this.rangeBar.abnormalise(task.timeRange.work_end.get())
+                                ];
+                            task.range = this.rangeBar.addRange(rangeVal);
+                            this.rangeBar.trigger('addrange', [
+                                task.range.val(),
+                                task.range
+                            ]);
+                            return this._addTaskAfter(task);
+                        },
+                        addTaskFromRange: function (range) {
+                            var params = {
+                                    work_start: this.rangeBar.normalise(range.range[0]),
+                                    work_end: this.rangeBar.normalise(range.range[1]),
+                                    unpaid_minutes: '',
+                                    job_name: '',
+                                    job_id: '',
+                                    timecard_id: '',
+                                    tasks: this.tasks
+                                };
+                            var task = new Task(params);
+                            task.range = range;
+                            return this._addTaskAfter(task);
+                        },
+                        _addTaskAfter: function (task) {
+                            this.setOnTimeChangeFunc(task);
+                            this.tasks.push(task);
+                            var self = this;
+                            for (var i in task.timeRange) {
+                                (function (i) {
+                                    task.timeRange[i].onChange(function () {
+                                        self.$el.trigger('change.task', [
+                                            task,
+                                            self.toJsonObj()
+                                        ]);
+                                    });
+                                }(i));
+                            }
+                            for (var i in task.info) {
+                                (function (i) {
+                                    task.info[i].onChange(function () {
+                                        self.$el.trigger('change.task', [
+                                            task,
+                                            self.toJsonObj()
+                                        ]);
+                                    });
+                                }(i));
+                            }
+                            return task;
+                        },
+                        bindTaskForm: function (task, $form) {
+                            task.$form = $form;
+                            for (var k in task.info) {
+                                (function (k) {
+                                    var $input = $form.find('input[data-tt-model=' + k + ']');
+                                    task.info[k].inputBind($input, [
+                                        'change.tt-model',
+                                        'keyup.tt-model'
+                                    ]);
+                                }(k));
+                            }
+                            for (var k in task.timeRange) {
+                                (function (k) {
+                                    var $input = $form.find('input[data-tt-model=' + k + ']');
+                                    task.timeRange[k].inputBind($input, [
+                                        'change.tt-model',
+                                        'keyup.tt-model'
+                                    ], function (val) {
+                                        return moment(val, TIME_FORMAT);
+                                    }, function (val) {
+                                        return val.format(TIME_FORMAT);
+                                    });
+                                }(k));
+                            }
+                            var $deleteButton = $form.find('button[data-tt-model=deleteButton]');
+                            $deleteButton.click($.proxy(function (ev) {
+                                ev.preventDefault();
+                                this.removeTask(task);
+                            }, this));
+                        },
+                        unbindTaskForm: function (task) {
+                            if (!task.$form)
+                                return;
+                            for (var k in task.timeRange) {
+                                task.timeRange[k].inputUnbind();
+                            }
+                            for (var k in task.info) {
+                                task.info[k].inputUnbind();
+                            }
+                            var $deleteButton = task.$form.find('button[data-tt-model=deleteButton]');
+                            $deleteButton.unbind('click');
+                            task.$form = null;
+                        },
+                        unbindTasks: function () {
+                            for (var i in this.tasks) {
+                                var t = this.tasks[i];
+                                this.unbindTaskForm(t);
+                            }
+                        },
+                        findTaskByRange: function (range) {
+                            for (var i in this.tasks) {
+                                var t = this.tasks[i];
+                                if (t.range === range)
+                                    return t;
+                            }
+                            return null;
+                        },
+                        rangeValToMoment: function (rangeVal) {
+                            return moment(this.rangeBar.normalise(rangeVal), TIME_FORMAT);
+                        },
+                        removeTask: function (task) {
+                            var jobId = task.info.job_id.get();
+                            this.unbindTaskForm(task);
+                            this.rangeBar.removeRange(task.range);
+                            task.remove();
+                            this.$el.trigger('delete.task', jobId);
+                        },
+                        toJsonObj: function () {
+                            var jsonObj = { tasks: [] };
+                            for (var i in this.tasks)
+                                var t = this.tasks[i];
+                            jsonObj.tasks.push(t.toJsonObj());
+                            return jsonObj;
+                        },
+                        fromJsonObj: function (jsonObj) {
+                            for (var t in jsonObj.tasks) {
+                                var t = jsonObj.tasks[i];
+                                t.work_start = moment(t.work_start).format('HH:mm');
+                                t.work_end = moment(t.work_end).format('HH:mm');
+                                this.addTask(t);
+                            }
+                        }
+                    });
+                module.exports = TimeTable;
+            },
+            {
+                './rangebar': 8,
+                './task': 9,
+                'estira': 12
+            }
+        ],
+        11: [
             function (_dereq_, module, exports) {
                 module.exports = {
                     isVertical: function () {
@@ -769,7 +1184,7 @@
             },
             {}
         ],
-        10: [
+        12: [
             function (_dereq_, module, exports) {
                 (function () {
                     (function (definition) {
@@ -861,5 +1276,5 @@
             },
             {}
         ]
-    }, {}, [8])(8);
+    }, {}, [10])(10);
 })
