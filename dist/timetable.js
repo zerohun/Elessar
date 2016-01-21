@@ -767,13 +767,13 @@
                         return new TimeRangeValidationError(TimeRangeValidationError.TYPES.LATER_START, newTimeRange);
                     var timeRange;
                     for (var i in tasks) {
-                        timeRange = task[i].timeRange;
+                        timeRange = tasks[i].timeRange;
                         var trKeys = [
                                 'work_start',
                                 'work_end'
                             ];
                         for (var j in trKeys) {
-                            trKey = trKeys[j];
+                            var trKey = trKeys[j];
                             if (timeRange.work_start.get() < newTimeRange[trKey] && timeRange.work_end.get() > newTimeRange[trKey] || newTimeRange.work_start < timeRange[trKey].get() && newTimeRange.work_end > timeRange[trKey].get()) {
                                 return new TimeRangeValidationError(TimeRangeValidationError.TYPES.FOLDED, newTimeRange);
                             }
@@ -968,6 +968,11 @@
                             this.rangeBar.on('click.range', function (ev, range) {
                                 ev.stopPropagation();
                                 ev.preventDefault();
+                                for (var i in self.tasks) {
+                                    self.tasks[i].range.$el.removeClass('selected');
+                                }
+                                if (range)
+                                    range.$el.addClass('selected');
                                 var task = self.findTaskByRange(range);
                                 if (task)
                                     self.$el.trigger('click.task', task);
@@ -1013,10 +1018,6 @@
                                     this.rangeBar.abnormalise(task.timeRange.work_end.get())
                                 ];
                             task.range = this.rangeBar.addRange(rangeVal);
-                            this.rangeBar.trigger('addrange', [
-                                task.range.val(),
-                                task.range
-                            ]);
                             return this._addTaskAfter(task);
                         },
                         addTaskFromRange: function (range) {
@@ -1128,9 +1129,10 @@
                         },
                         toJsonObj: function () {
                             var jsonObj = { tasks: [] };
-                            for (var i in this.tasks)
+                            for (var i in this.tasks) {
                                 var t = this.tasks[i];
-                            jsonObj.tasks.push(t.toJsonObj());
+                                jsonObj.tasks.push(t.toJsonObj());
+                            }
                             return jsonObj;
                         },
                         fromJsonObj: function (jsonObj) {
