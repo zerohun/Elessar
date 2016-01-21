@@ -36,27 +36,30 @@
        <label for="timecard_id">timecard_id</label>
       <input type="text" name="timecard_id" data-tt-model="timecard_id">
     </div>
+    <button data-tt-model="deleteButton">delete</button>
     <button type="submit" class="btn btn-default">Submit</button>
+
     </form>
 
 <pre class="changing"></pre>
 
 <script>
 var timeTable = TimeTable();
-$('#time-table').prepend(timeTable.$el);
+$('body').prepend(timeTable.$el);
 timeTable.on("click.task", function(ev, t){
   timeTable.unbindTasks();
   console.log(ev);
   console.log(t);
-  t.bindForm("form");
+  timeTable.bindTaskForm(t, $("form"));
 }).on("changing.task", function(ev, t){
   console.log('ct');
 }).on("addtask", function(ev, t){
   console.log('addtask');
-  t.bindForm("form");
+  timeTable.bindTaskForm(t, $("form"));
 })
 window.t = timeTable;
 $('form').submit(function(e){
+  e.preventDefault();
   var sArray = $(this).serializeArray();
   var params = {};
   for(var t of sArray){
