@@ -1,6 +1,6 @@
 .elessar-handle {
   display: block;
-  background: white;
+  background: black;
   height: 100%;
   width: 5px;
   cursor: ew-resize;
@@ -52,7 +52,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background: skyblue;
+  background: blue;
+  color: white;
   width: 0;
   z-index: 10;
 }
