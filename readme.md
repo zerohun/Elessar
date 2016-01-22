@@ -5,6 +5,13 @@ TimeTable is task management UI component built on top of **[Elessar](https://gi
 
 TimeTable bind each Elessar's range sliders to html form so user can change detail of task and time.
 
+
+Demo urls
+-----
+http://entireangle.com:8080/demos/index.html
+http://entireangle.com:8080/demos/index2.html
+http://entireangle.com:8080/demos/index3.html
+
 Using
 -----
 
