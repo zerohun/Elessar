@@ -185,16 +185,9 @@ $('#cerate-form-1').submit(function(e){
   }
   timeTableFirst.addTask(params);
 });
-$('body').click(function(){
-  timeTableFirst.unbindTasks();
-});
 $('.delete-task').click(function(e){
   e.preventDefault();
 });
-$('input,button').click(function(ev){
-  ev.stopPropagation();
-});
-
 $(".export-to-json").click(function(){
   alert(JSON.stringify(timeTableFirst.toJsonObj()));
 });
