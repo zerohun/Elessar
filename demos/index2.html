@@ -10,20 +10,16 @@
 <link rel="stylesheet" type="text/css" href="../bootstrap.min.css">
 </head>
 <body>
-  <h3>Creation, Deletion, Event<h3>
+  <h3>Multiple reactive forms<h3>
   <div class="row">
-    <div id="slider-1" class="col-md-12">
+    <div id="slider-2" class="col-md-12">
     </div>
-    <br>
-    <button class="btn btn-success export-to-json">Download Json</button>
   </div>
-    <br>
-  <br>
-  <div id="slider-1-control" class="row">
+  <div id="slider-2-control" class="row">
     <div class="col-xs-6">
-      <h4>Create form</h4>
+      <h4>Edit form - 1 (left range)</h4>
       <hr>
-      <form id="cerate-form-1">
+      <form id="edit-form-2-1">
         <div class="form-group">
            <label for="work_start">work_start</label>
           <input type="time" name="work_start" data-tt-model="work_start" placeholder="HH:mm ex) 19:30">
@@ -48,13 +44,12 @@
            <label for="timecard_id">timecard_id</label>
           <input type="text" name="timecard_id" data-tt-model="timecard_id">
         </div>
-        <button type="submit" class="btn btn-default" class="btn btn-primary">Create</button>
       </form>
     </div>
     <div class="col-xs-6">
-      <h4>Edit form</h4>
+      <h4>Edit form - 2 (right range)</h4>
       <hr>
-      <form id="edit-form-1">
+      <form id="edit-form-2-2">
          <div class="form-group">
            <label for="work_start">work_start</label>
           <input type="time" name="work_start" data-tt-model="work_start" placeholder="HH:mm ex) 19:30">
@@ -79,61 +74,26 @@
            <label for="timecard_id">timecard_id</label>
           <input type="text" name="timecard_id" data-tt-model="timecard_id">
         </div>
-        <button class="btn btn-danger delete-task" data-tt-model="deleteButton">delete</button>
       </form>
     </div>
-  </div>
-  <div class="row">
-    <div id="event-console-box" class="col-md-12" style="width:100%; background-color:grey; color:white">
-    </div>
-  </div>
-
 <script>
-var timeTableFirst = TimeTable();
-$('#slider-1').prepend(timeTableFirst.$el);
-timeTableFirst.on("click.task", function(ev, t){
-  timeTableFirst.unbindTasks();
-  timeTableFirst.bindTaskForm(t, $("#edit-form-1"));
-}).on("change.task", function(ev, t){
-  console.log(t);
-  $("#event-console-box").prepend($('<pre>').html(JSON.stringify(
-    $.extend(t.toJsonObj(), {event: "change task"}),
-    null, 2)));
-}).on("addtask", function(ev, t){
-  $("#event-console-box").prepend($('<pre>').html(JSON.stringify(
-    $.extend(t.toJsonObj(), {event: "add task"}),
-    null, 2)));
-}).on("delete.task", function(ev,jobId){
-  $("#event-console-box").prepend($('<pre>').html(JSON.stringify(
-    {event: "delete task", job_id: jobId}),
-    null, 2));
+var timeTableSecond = TimeTable();
+$('#slider-2').prepend(timeTableSecond.$el);
+
+var taskOne = timeTableSecond.addTask({
+  work_start: "02:30",
+  work_end: "05:30",
 });
 
-$('#cerate-form-1').submit(function(e){
-  e.preventDefault();
-  var sArray = $(this).serializeArray();
-  var params = {};
-  for(var t of sArray){
-    params[t.name] = t.value;
-  }
-  timeTableFirst.addTask(params);
-});
-$('.delete-task').click(function(e){
-  e.preventDefault();
+var taskTwo = timeTableSecond.addTask({
+  work_start: "07:30",
+  work_end: "09:30",
 });
 
 
-$(".export-to-json").click(function(){
-  var text = JSON.stringify(timeTableFirst.toJsonObj(), null, 2);
-  var filename = "schedule.json";
-  var element = document.createElement('a');
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-  element.setAttribute('download', filename);
-  element.style.display = 'none';
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
-});
+timeTableSecond.bindTaskForm(taskOne, $("#edit-form-2-1"));
+timeTableSecond.bindTaskForm(taskTwo, $("#edit-form-2-2"));
+
 
 
 </script>
