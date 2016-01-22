@@ -966,7 +966,10 @@
                                 ev.stopPropagation();
                                 ev.preventDefault();
                                 var task = self.addTaskFromRange(range);
-                                self.$el.trigger('addtask', task);
+                                self.$el.trigger('addtask', [
+                                    task,
+                                    self
+                                ]);
                             });
                             this.rangeBar.on('click.range', function (ev, range) {
                                 ev.stopPropagation();
@@ -978,14 +981,20 @@
                                     range.$el.addClass('selected');
                                 var task = self.findTaskByRange(range);
                                 if (task)
-                                    self.$el.trigger('click.task', task);
+                                    self.$el.trigger('click.task', [
+                                        task,
+                                        self
+                                    ]);
                             });
                             this.rangeBar.on('change', function (ev, a, b, rangeObj) {
                                 ev.stopPropagation();
                                 ev.preventDefault();
                                 var task = self.findTaskByRange(rangeObj);
                                 if (task)
-                                    self.$el.trigger('change.task', task);
+                                    self.$el.trigger('change.task', [
+                                        task,
+                                        self
+                                    ]);
                             });
                             this.rangeBar.on('changing', function (ev, nrange, changed, rangeObj) {
                                 ev.stopPropagation();

@@ -41,8 +41,20 @@
     <button class="btn btn-danger delete-task" data-tt-model="deleteButton">delete</button>
   </form>
 <script>
-function clickHandler(ev ,t){
-  timeTable.unbindTasks();
+var lastTimeTable;
+var lastTask;
+function clickHandler(ev ,t, timeTable){
+  console.log('click');
+  console.log(t);
+  console.log(timeTable);
+
+  if(lastTimeTable)
+    lastTimeTable.unbindTasks();
+
+  if(lastTask)
+    lastTask.range.$el.removeClass('selected');
+  lastTimeTable = timeTable;
+  lastTask = t;
   timeTable.bindTaskForm(t, $("#edit-form"));
 }
 var timeTable = TimeTable();
