@@ -981,6 +981,8 @@
                                     self.$el.trigger('click.task', task);
                             });
                             this.rangeBar.on('change', function (ev, a, b, rangeObj) {
+                                ev.stopPropagation();
+                                ev.preventDefault();
                                 var task = self.findTaskByRange(rangeObj);
                                 if (task)
                                     self.$el.trigger('change.task', task);
