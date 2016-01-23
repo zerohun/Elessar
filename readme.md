@@ -131,7 +131,17 @@ Task Object
   setter and getter methods of property
 */
 task.timeRange.work_start.set(/* momentJS object*/);
-//It immediately change time range size and form input value that is bound with this object
+/*
+It immediately change time range size and form input value that is bound with this object
+If there is any validation error, for example duplication or start time is later then end time, it will return error object
+So developer can decide how it should act on validation error
+
+  function(errorType, timeRange){
+    this.errorType = errorType;
+    this.timeRange = timeRange; 
+    this.isErrorObj = true;
+  }
+  */
 
 task.timeRange.work_end.get();
 
