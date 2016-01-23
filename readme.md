@@ -47,8 +47,7 @@ timeTable.addTask({
       unpaid_minutes: 22,
       job_name: "harvest",
       job_id: 22,
-      timecard_id: 233,
-      tasks: this.tasks
+      timecard_id: 233
 });
 ```
 
@@ -121,7 +120,19 @@ It will return this form of data
 , .....]}
 ```
 ### ``.fromJsonObj(jsonObj)``
+It loads from json object.  it will also immediately change views.
 
+### ``.focusTask(task)``
+It adds 'select' class to the task's range. With default css, It changes color of the range to lightblue.
+
+### ``.unFocusTask(task)``
+It remove 'select' class to the task's range. With default css, It changes back to blue color
+
+### ``.unFocusTasks()``
+It remove 'select' class from all tasks of current timetable.
+
+### ``.tasks``
+Array of tasks that belongs to current time table.
 
 
 Task Object
@@ -163,7 +174,6 @@ returns following form of object
       timecard_id: Number
 } 
 */
-
 task.fromJsonObj(jsonObj)
 ```
 
