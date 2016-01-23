@@ -180,16 +180,16 @@ task.fromJsonObj(jsonObj)
 
 Events
 ---
-### ``.on('addTask', function(ev, task){...}) ``
+### ``.on('addTask', function(ev, task, timeTable){...}) ``
 This event is fired whenever there is a new task created
 
-### ``.on('click.task', function(ev, task){...}) ``
+### ``.on('click.task', function(ev, task, timeTable){...}) ``
 This event is fired whenever time range(task) is clicked
 
-### ``.on('change.task', function(ev, task){...}) ``
+### ``.on('change.task', function(ev, task, timeTable){...}) ``
 This event is fired whenever task's data is changed
 
-### ``.on('delete.task', function(ev, job_id){...}) ``
+### ``.on('delete.task', function(ev, job_id, timeTable){...}) ``
 This event is fired whenever task's data is deleted, deleted task's job_id is delivered with this event.
 
 
