@@ -50,7 +50,8 @@ with using observer pattern, simply using setter of those object will notify oth
  - Considering task property's data type 
    It currently binding every property on input tag but probably user shouldn't able to change job_id, timstamp_id   
 
-
+ - Test code
+   I think it's really important especially when it comes to library 
     
 
 
