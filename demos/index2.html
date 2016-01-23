@@ -90,12 +90,10 @@ var taskTwo = timeTableSecond.addTask({
   work_end: "09:30",
 });
 
-
 timeTableSecond.bindTaskForm(taskOne, $("#edit-form-2-1"));
 timeTableSecond.bindTaskForm(taskTwo, $("#edit-form-2-2"));
-
-
-
+timeTableSecond.focusTask(taskOne);
+timeTableSecond.focusTask(taskTwo);
 </script>
 </body>
 </html>
