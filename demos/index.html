@@ -5,7 +5,7 @@
 <script src="/lib/external/jquery.min.js"></script>
 <script src="/lib/external/index.js"></script>
 <script src="/lib/external/bootstrap.min.js"></script>
-<script src="/dist/timetable.min.js?timestamp=1"></script>
+<script src="/dist/timetable.min.js?timestamp=2"></script>
 <link rel="stylesheet" type="text/css" href="../elessar.css">
 <link rel="stylesheet" type="text/css" href="../bootstrap.min.css">
 </head>
@@ -93,13 +93,18 @@ var timeTableFirst = TimeTable();
 $('#slider-1').prepend(timeTableFirst.$el);
 timeTableFirst.on("click.task", function(ev, t){
   timeTableFirst.unbindTasks();
+  timeTableFirst.unFocusTasks();
   timeTableFirst.bindTaskForm(t, $("#edit-form-1"));
+  timeTableFirst.focusTask(t);
 }).on("change.task", function(ev, t){
-  console.log(t);
   $("#event-console-box").prepend($('<pre>').html(JSON.stringify(
     $.extend(t.toJsonObj(), {event: "change task"}),
     null, 2)));
 }).on("addtask", function(ev, t){
+  timeTableFirst.unbindTasks();
+  timeTableFirst.unFocusTasks();
+  timeTableFirst.bindTaskForm(t, $("#edit-form-1"));
+  timeTableFirst.focusTask(t);
   $("#event-console-box").prepend($('<pre>').html(JSON.stringify(
     $.extend(t.toJsonObj(), {event: "add task"}),
     null, 2)));

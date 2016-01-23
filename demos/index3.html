@@ -44,24 +44,21 @@
 var lastTimeTable;
 var lastTask;
 function clickHandler(ev ,t, timeTable){
-  console.log('click');
-  console.log(t);
-  console.log(timeTable);
-
   if(lastTimeTable)
     lastTimeTable.unbindTasks();
-
   if(lastTask)
-    lastTask.range.$el.removeClass('selected');
+    lastTimeTable.unFocusTask(lastTask);
   lastTimeTable = timeTable;
   lastTask = t;
   timeTable.bindTaskForm(t, $("#edit-form"));
+  timeTable.focusTask(t);
 }
 var timeTable = TimeTable();
 for(var i=0;i<1000;i++){
   var timeTable = new TimeTable();
   $("#sliders").prepend(timeTable.$el);
   timeTable.on("click.task", clickHandler);
+  timeTable.on('addtask', clickHandler)
 }
 
 </script>

@@ -985,11 +985,6 @@
                             this.rangeBar.on('click.range', function (ev, range) {
                                 ev.stopPropagation();
                                 ev.preventDefault();
-                                for (var i in self.tasks) {
-                                    self.tasks[i].range.$el.removeClass('selected');
-                                }
-                                if (range)
-                                    range.$el.addClass('selected');
                                 var task = self.findTaskByRange(range);
                                 if (task)
                                     self.$el.trigger('click.task', [
@@ -1149,6 +1144,17 @@
                             task.remove();
                             this.$el.trigger('delete.task', jobId);
                         },
+                        focusTask: function (task) {
+                            task.range.$el.addClass('selected');
+                        },
+                        unFocusTask: function (task) {
+                            task.range.$el.removeClass('selected');
+                        },
+                        unFocusTasks: function () {
+                            for (var i in this.tasks) {
+                                this.tasks[i].range.$el.removeClass('selected');
+                            }
+                        },
                         toJsonObj: function () {
                             var jsonObj = { tasks: [] };
                             for (var i in this.tasks) {
@@ -1167,6 +1173,7 @@
                         }
                     });
                 module.exports = TimeTable;
+                window.TimeTable;
             },
             {
                 './rangebar': 8,
