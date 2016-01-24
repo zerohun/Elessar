@@ -193,5 +193,9 @@ This event is fired whenever task's data is changed
 This event is fired whenever task's data is deleted, deleted task's job_id is delivered with this event.
 
 
+### ``.on('selecttime', function(ev, timeString, timeTable){...}) ``
+Only in mobile, This event is fired when user touch timetable space where there isn't any task located
+
+
 
 
