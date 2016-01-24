@@ -14,6 +14,8 @@ http://entireangle.com:8080/demos/index2.html
 
 http://entireangle.com:8080/demos/index3.html
 
+mobile page: http://entireangle.com:8080/demos/index.mobile.html
+
 Using
 -----
 
