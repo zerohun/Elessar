@@ -1024,7 +1024,10 @@
                             this.rangeBar.on('selecttime', function (ev, startTime) {
                                 ev.stopPropagation();
                                 ev.preventDefault();
-                                self.$el.trigger('selecttime', startTime);
+                                self.$el.trigger('selecttime', [
+                                    startTime,
+                                    self
+                                ]);
                             });
                         },
                         on: function () {
