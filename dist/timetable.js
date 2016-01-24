@@ -229,7 +229,7 @@
                                 this.$el.prepend('<div class="elessar-handle">').append('<div class="elessar-handle">');
                                 this.on('mouseenter.elessar touchstart.elessar', $.proxy(this.removePhantom, this));
                                 this.on('mousedown.elessar touchstart.elessar', $.proxy(this.mousedown, this));
-                                this.on('click', $.proxy(this.click, this));
+                                this.on('click touchstart.elessar', $.proxy(this.click, this));
                             } else {
                                 this.$el.addClass('elessar-readonly');
                             }
@@ -501,6 +501,7 @@
                             this.ranges = [];
                             this.on('mousemove.elessar touchmove.elessar', $.proxy(this.mousemove, this));
                             this.on('mouseleave.elessar touchleave.elessar', $.proxy(this.removePhantom, this));
+                            this.on('touchstart', $.proxy(this.touchstart, this));
                             if (options.values)
                                 this.setVal(options.values);
                             if (options.bgLabels) {
@@ -671,6 +672,15 @@
                                 return this.options.readonly.call(this);
                             }
                             return this.options.readonly;
+                        },
+                        touchstart: function (ev) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            var w = this.options.minSize ? this.abnormaliseRaw(this.options.minSize + this.options.min) : 0.05;
+                            var pageStart = getEventProperty(this.ifVertical('pageY', 'pageX'), ev);
+                            var val = (pageStart - this.startProp('offset')) / this.totalSize() - w / 2;
+                            this.trigger('selecttime', this.normalise(val));
+                            this.mousemove(ev);
                         },
                         mousemove: function (ev) {
                             var w = this.options.minSize ? this.abnormaliseRaw(this.options.minSize + this.options.min) : 0.05;
@@ -1011,6 +1021,11 @@
                                 task.timeRange.work_start.setWithoutCallback(work_start_val);
                                 task.timeRange.work_end.setWithoutCallback(work_end_val);
                             });
+                            this.rangeBar.on('selecttime', function (ev, startTime) {
+                                ev.stopPropagation();
+                                ev.preventDefault();
+                                self.$el.trigger('selecttime', startTime);
+                            });
                         },
                         on: function () {
                             this.$el.on.apply(this.$el, arguments);
@@ -1038,6 +1053,10 @@
                                     this.rangeBar.abnormalise(task.timeRange.work_end.get())
                                 ];
                             task.range = this.rangeBar.addRange(rangeVal);
+                            this.$el.trigger('addtask', [
+                                task,
+                                self
+                            ]);
                             return this._addTaskAfter(task);
                         },
                         addTaskFromRange: function (range) {

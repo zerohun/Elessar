@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<script src="/lib/external/moment.min.js"></script>
+<script src="/lib/external/jquery.min.js"></script>
+<script src="/lib/external/index.js"></script>
+<script src="/lib/external/bootstrap.min.js"></script>
+<script src="/dist/timetable.min.js?timestamp=3"></script>
+<link rel="stylesheet" type="text/css" href="../elessar.css">
+<link rel="stylesheet" type="text/css" href="../bootstrap.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+</head>
+<body style="overflow-x: hidden">
+  <h3>Mobile<h3>
+  <div class="row">
+    <div id="slider-1" class="col-md-12">
+    </div>
+  </div>
+  <div id="slider-1-control" class="row">
+    <div class="col-sm-12">
+      <form id="task-form">
+        <div class="form-group">
+           <label for="work_start">work_start</label>
+          <input type="time" name="work_start" data-tt-model="work_start" placeholder="HH:mm ex) 19:30">
+        </div>
+         <div class="form-group">
+           <label for="work_end">work_end</label>
+          <input type="time" name="work_end" data-tt-model="work_end" placeholder="HH:mm ex) 20:30">
+        </div>
+         <div class="form-group">
+           <label for="unpaid_minutes">unpaid_minutes</label>
+          <input type="text" name="unpaid_minutes" data-tt-model="unpaid_minutes">
+        </div>
+         <div class="form-group">
+           <label for=job_name>job_name</label>
+          <input type="text" name="job_name" data-tt-model="job_name">
+        </div>
+         <div class="form-group">
+           <label for="job_id">job_id</label>
+          <input type="text" name="job_id" data-tt-model="job_id">
+        </div>
+         <div class="form-group">
+           <label for="timecard_id">timecard_id</label>
+          <input type="text" name="timecard_id" data-tt-model="timecard_id">
+        </div>
+        <button type="submit" class="btn btn-primary submit-btn" style="display:none">Create</button>
+        <button tt-model="deleteButton" class="btn btn-danger delete-btn" style="display:none">Delete</button>
+      </form>
+    </div>
+  </div>
+<script>
+var timeTableFirst = TimeTable();
+$('#slider-1').prepend(timeTableFirst.$el);
+timeTableFirst.on("click.task", function(ev, t){
+  timeTableFirst.unbindTasks();
+  timeTableFirst.unFocusTasks();
+  timeTableFirst.bindTaskForm(t, $("#task-form"));
+  timeTableFirst.focusTask(t);
+  $(".submit-btn").hide();
+  $(".delete-btn").show();
+}).on("addtask", function(ev, t){
+  timeTableFirst.unbindTasks();
+  timeTableFirst.unFocusTasks();
+  timeTableFirst.bindTaskForm(t, $("#task-form"));
+  timeTableFirst.focusTask(t);
+  $(".submit-btn").hide();
+  $(".delete-btn").show();
+}).on("selecttime", function(ev,timeStr){
+  timeTableFirst.unbindTasks();
+  timeTableFirst.unFocusTasks();
+  $("#task-form input[data-tt-model='work_start']").val(timeStr);
+  $("#task-form input[data-tt-model='work_end']").val("");
+  $(".submit-btn").show();
+  $(".delete-btn").hide();
+});
+
+$('#task-form').submit(function(e){
+  e.preventDefault();
+  var sArray = $(this).serializeArray();
+  var params = {};
+  for(var t of sArray){
+    params[t.name] = t.value;
+  }
+  timeTableFirst.addTask(params);
+});
+$('.delete-task').click(function(e){
+  e.preventDefault();
+});
+
+</script>
+</body>
+</html>
